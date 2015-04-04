@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 
 public class SimpleRayTracing {
 
-	private static final Vector3D ORIGIN = new Vector3D(0, -12, -15);
+	private static final Vector3D ORIGIN = new Vector3D(-3, -15, -15);
 	private static final BufferedImage FRAME = new BufferedImage(1256, 1256, BufferedImage.TYPE_INT_RGB);
 	private static final ArrayList<Surface> SURFACES = initializeSurfaces();
 	private static final ArrayList<Light> LIGHTS = initializeLights();
@@ -39,7 +39,7 @@ public class SimpleRayTracing {
 
 				Vector3D direction = new Vector3D(a, b, c);
 				Ray ray = new Ray(ORIGIN, direction);
-				Color pixelColor = determinePixelColor(SURFACES, ray);
+				Color pixelColor = determinePixelColor(ray);
 				FRAME.setRGB(i, j,  pixelColor.getRGB());
 			}
 		}
@@ -50,11 +50,14 @@ public class SimpleRayTracing {
 		System.out.println("Execution completed in " + totalTime + "ms.");
 	}
 
-	private static Color determinePixelColor(ArrayList<Surface> surfaces, Ray ray) {
+	private static Color determinePixelColor(Ray ray) {
 
 		Color pixelColor;
-
-		if(hasIntersect(surfaces, ray)) {
+		//		if(depth > 10) {
+		//			//System.out.println(depth);
+		//			pixelColor = Color.BLACK;
+		//		}
+		if(hasIntersect(SURFACES, ray)) {
 
 			Vector3D hitPoint = ray.getRayAtT();
 			Vector3D normal = hitPoint.subtract(ray.getSphere().getCenter()).normalize();
@@ -68,7 +71,8 @@ public class SimpleRayTracing {
 				Vector3D angle = angleVariance.generateRandomPoint();
 				direction = angle.subtract(hitPoint).normalize();
 				ray = new Ray(hitPoint, direction);	
-				pixelColor = determinePixelColor(surfaces, ray);
+				pixelColor = determinePixelColor(ray);
+
 			}
 			else {
 
@@ -77,24 +81,22 @@ public class SimpleRayTracing {
 				if(intersectedObject instanceof Light) {
 
 				}
-				else if(intersectedObject.isTextured()) {
+				else{
 					pixelColor = normalShade(pixelColor, hitPoint);
 				}
-				else {
-					
-					hitPoint = ray.getRayAtT();
-					normal = hitPoint.subtract(ray.getSphere().getCenter()).normalize();
-					Vector3D direction = hitPoint.add(normal.multiply(2));
-					Sphere angle = new Sphere(direction, normal.getMagnitude(), Color.WHITE);
-					Vector3D randomPoint = angle.generateRandomPoint();
-					direction = randomPoint.subtract(hitPoint).normalize();
-					ray = new Ray(hitPoint, direction);	
-
-					Color diffuseColor = determinePixelColor(surfaces, ray);
-					
-					pixelColor =  new Color((diffuseColor.getRed() + pixelColor.getRed())/2, (diffuseColor.getGreen() + pixelColor.getGreen())/2, (diffuseColor.getBlue() + pixelColor.getBlue())/2);
-					pixelColor = normalShade(pixelColor, hitPoint);
-				}
+//				else {
+//
+//					Vector3D direction = hitPoint.add(normal.multiply(2));
+//					Sphere angle = new Sphere(direction, normal.getMagnitude(), Color.WHITE);
+//					Vector3D randomPoint = angle.generateRandomPoint();
+//					direction = randomPoint.subtract(hitPoint).normalize();
+//					ray = new Ray(hitPoint, direction);	
+//
+//					Color diffuseColor = determinePixelColor(ray);
+//
+//					pixelColor =  new Color((diffuseColor.getRed() + pixelColor.getRed())/2, (diffuseColor.getGreen() + pixelColor.getGreen())/2, (diffuseColor.getBlue() + pixelColor.getBlue())/2);
+//					pixelColor = normalShade(pixelColor, hitPoint);
+//				}
 			}
 		}
 		else {
@@ -159,20 +161,23 @@ public class SimpleRayTracing {
 	private static ArrayList<Surface> initializeSurfaces() {
 
 		ArrayList<Surface> surfaces = new ArrayList<Surface>();
-		surfaces.add(new Orb(new Vector3D(0, 50, 0), 3));
-		//surfaces.add(new Orb(new Vector3D(0, -3.5, 0), 3, "sun.jpg"));
-		//		surfaces.add(new Sphere(new Vector3D(-4, -4, -8), .25, "mercury.png"));
-		//		surfaces.add(new Sphere(new Vector3D(-13, -6, -15), .55, "venus.jpg"));
-		//		surfaces.add(new Sphere(new Vector3D(0, -4, -20), 1.5, "earth.jpg"));
-		//		surfaces.add(new Sphere(new Vector3D(-.5, -4.8, -17), .33, "moon.jpg"));
-		//		surfaces.add(new Sphere(new Vector3D(22, -2, -26), 1, "mars.jpg"));
-		//		surfaces.add(new Sphere(new Vector3D(-10, 10, -14), 1, "jupiter.jpg"));
+	//	surfaces.add(new Orb(new Vector3D(0, 50, 0), 3));
+		surfaces.add(new Orb(new Vector3D(0, -3.5, 0), 3, "sun.jpg"));
+		surfaces.add(new Sphere(new Vector3D(-4, -4, -8), .25, "mercury.png"));
+		surfaces.add(new Sphere(new Vector3D(-13, -6, -15), .55, "venus.jpg"));
+		surfaces.add(new Sphere(new Vector3D(0, -4, -20), 1.5, "earth.jpg"));
+		surfaces.add(new Sphere(new Vector3D(-.5, -4.8, -17), .33, "moon.jpg"));
+		surfaces.add(new Sphere(new Vector3D(22, -2, -26), 1, "mars.jpg"));
+		surfaces.add(new Sphere(new Vector3D(-10, 10, -14), 1, "jupiter.jpg"));
 		surfaces.add(new Sphere(new Vector3D(0, -115, -25), 98.5, Color.WHITE));
-		surfaces.add(new Sphere(new Vector3D(-5, -14, -22), 1, Color.BLUE));
-		surfaces.add(new Sphere(new Vector3D(-2, -15, -23), 1, Color.RED));
-		surfaces.add(new Sphere(new Vector3D(-5, -10, -22), 1, true));
+		surfaces.add(new Sphere(new Vector3D(-4, -15, -22), 1, Color.BLUE));
+		surfaces.add(new Sphere(new Vector3D(-2, -15, -22), 1, Color.RED));
+		surfaces.add(new Sphere(new Vector3D(-6, -15.15, -22), 1, Color.GREEN));
+		surfaces.add(new Sphere(new Vector3D(-8, -15.3, -22), 1, Color.YELLOW));
+		surfaces.add(new Sphere(new Vector3D(-5, -12, -19.2), 1, Color.CYAN));
+		surfaces.add(new Sphere(new Vector3D(-2, -12, -19.2), 1, "jupiter.jpg"));
+		surfaces.add(new Sphere(new Vector3D(0, -15, -20), 1, true));
 		surfaces.add(new Sphere(new Vector3D(8, -16, -18), 1, true));
-
 
 		return surfaces;
 	}
