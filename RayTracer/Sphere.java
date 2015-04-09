@@ -57,7 +57,7 @@ public class Sphere implements Surface {
 
 	public Color getColor(Vector3D normalPoint) {
 		
-		if(this.isTextured) {
+		if(this.isTextured()) {
 			
 			double u = ((Math.atan2(normalPoint.getX(), normalPoint.getZ())/(2*Math.PI)) + .5);
 			double v = (.5 - Math.asin(normalPoint.getY())/Math.PI);
@@ -78,10 +78,7 @@ public class Sphere implements Surface {
 	}
 
 	public void intersect(Ray ray) {
-		if(this.isTextured) 
-		{
-			
-		}
+		
 		Vector3D negativeCenter = ray.getOrigin().subtract(this.center);
 
 		double a = ray.getDirection().dot(ray.getDirection());
@@ -99,7 +96,7 @@ public class Sphere implements Surface {
 			
 			if(d < ray.getT() && d > 0.01) {
 				ray.setT(d);
-				ray.setSphere(this);
+				ray.setSurface(this);
 			}	
 		}	
 	}

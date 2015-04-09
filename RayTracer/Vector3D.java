@@ -75,10 +75,10 @@ public class Vector3D {
 				+ this.z * other.z;
 	}
 	
-	public double dot(double x, double y, double z) {
-		return this.x * x 
-				+ this.y * y 
-				+ this.z * z;
+	public Vector3D cross(Vector3D other) {
+		return new Vector3D(this.y * other.z - this.z * other.y, 
+				this.z * other.x - this.x * other.z, 
+				this.x * other.y - this.y * other.x);	
 	}
 	
 	public Vector3D normalize() {

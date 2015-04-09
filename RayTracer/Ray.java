@@ -5,7 +5,7 @@ public class Ray {
 	private Vector3D origin;
 	private Vector3D direction;
 	private double t;
-	private Sphere sphere;
+	private Surface surface;
 	
 	public Ray(Vector3D origin, Vector3D direction) {
 		this.origin = origin;
@@ -29,12 +29,12 @@ public class Ray {
 		this.t = t;
 	}
 
-	public Sphere getSphere() {
-		return this.sphere;
+	public Surface getSurface() {
+		return this.surface;
 	}
 
-	public void setSphere(Sphere sphere) {
-		this.sphere = sphere;
+	public void setSurface(Surface surface) {
+		this.surface = surface;
 	}
 
 	public Vector3D getOrigin() {
