@@ -18,8 +18,12 @@ public class Vector3D {
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 
-	public double getMagnitude(Vector3D center) {
-		return Math.sqrt(x * x - center.x * center.x + y * y - center.y * center.y + z * z - center.z * center.z);
+	public double getMagnitude(Vector3D other) {
+		double x = this.x - other.x;
+		double y = this.y - other.y;
+		double z = this.z - other.z;
+		
+		return Math.sqrt(x * x + y * y + z * z);
 	}
 	
 	public double getMagnitudeSquared() {

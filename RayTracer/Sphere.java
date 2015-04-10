@@ -15,6 +15,8 @@ public class Sphere implements Surface {
 	private Color color;
 	private boolean isReflective;
 	private boolean isTextured;
+	private int height;
+	private int width;
 	private BufferedImage texture;
 	
 	public Sphere(Vector3D center, double radius, Color color) {
@@ -45,6 +47,8 @@ public class Sphere implements Surface {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		this.height = texture.getHeight() - 1;
+		this.width = texture.getWidth() - 1;
 	}
 	
 	public boolean isTextured() {
@@ -61,8 +65,8 @@ public class Sphere implements Surface {
 			
 			double u = ((Math.atan2(normalPoint.getX(), normalPoint.getZ())/(2*Math.PI)) + .5);
 			double v = (.5 - Math.asin(normalPoint.getY())/Math.PI);
-			int x = (int)(u * (this.texture.getWidth() - 1));
-			int y = (int)(v * (this.texture.getHeight() - 1));
+			int x = (int)(u * width);
+			int y = (int)(v * height);
 			return new Color(this.texture.getRGB(x, y));
 		}
 		else
