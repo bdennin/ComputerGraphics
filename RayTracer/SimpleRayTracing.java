@@ -5,52 +5,65 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.imageio.ImageIO;
 
 public class SimpleRayTracing {
 
-	private static final Vector3D ORIGIN = new Vector3D(0, 0, 300);
-	private static final BufferedImage FRAME = new BufferedImage(2000, 2000, BufferedImage.TYPE_INT_RGB);
+	private static final Vector3D ORIGIN = new Vector3D(0, 0, 0);
+	private static final BufferedImage FRAME = new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB);
 	private static final ArrayList<Surface> SURFACES = initializeSurfaces();
 	private static final ArrayList<Light> LIGHTS = initializeLights();
+	private static final int WIDTH = FRAME.getWidth() - 1;
+	private static final int HEIGHT = FRAME.getHeight() - 1;
 	private static final int TOTAL_SURFACES = SURFACES.size(); 
-	private static final int LIGHT_ITERATIONS = 100;
+	private static final int SQUARE_LENGTH = 4;
+	private static final int LIGHT_ITERATIONS = 3000;
 
 	private static BufferedImage backgroundTexture;
 
 	public static void main(String[] args) throws IOException {
 
 		backgroundTexture = ImageIO.read(new File("stars.png"));
-
 		double startTime = System.currentTimeMillis();
-		int y = FRAME.getHeight();
-		int x = FRAME.getWidth();
-		int percentage = x/10;
 		
-		for(int i = 0; i < x; i++) {
-			for(int j = 0; j < y; j++) {
-
-				if(i%percentage == 0 && i != 0 && j == 0)
-					System.out.printf("%d0 percent completed\n", i/percentage);
-
-				double a = (-1 + 2 * (double)i/x);
-				double b = (1 - 2 * (double)j/y);
-				double c = -1;
-
-				Vector3D direction = new Vector3D(a, b, c);
-				Ray ray = new Ray(ORIGIN, direction);
-				Color pixelColor = determinePixelColor(ray, 1);
-				FRAME.setRGB(i, j,  pixelColor.getRGB());
-			}
-		}
-
+		drawPicture(0, WIDTH, 0, HEIGHT);
+		
 		ImageIO.write(FRAME, "png", new File("/Users/jimbob/Downloads/Sphere.png"));
 		double endTime = System.currentTimeMillis();
 		double totalTime = endTime - startTime;
 		System.out.println("Execution completed in " + totalTime + "ms.");
 	}
 
+	private static void drawPicture(int x, int xMax, int y, int yMax) {
+		if(xMax - x <= SQUARE_LENGTH || yMax - y <= SQUARE_LENGTH) {
+			
+			for(int i = y; i <= yMax; i++) {
+				for(int j = x; j <= xMax; j++) {
+					
+					double a = (-1 + 2 * (double)i/WIDTH);
+					double b = (1 - 2 * (double)j/HEIGHT);
+					double c = -1;
+
+					Vector3D direction = new Vector3D(a, b, c);
+					Ray ray = new Ray(ORIGIN, direction);
+					Color pixelColor = determinePixelColor(ray, 1);
+					FRAME.setRGB(i, j,  pixelColor.getRGB());
+				}
+			}
+		}
+		else {
+			int xAverage = (xMax + x)/2;
+			int yAverage = (yMax + y)/2;
+			
+			drawPicture(x, xAverage, y, yAverage);
+			drawPicture(xAverage + 1, xMax, y, yAverage);
+			drawPicture(x, xAverage, yAverage + 1, yMax);
+			drawPicture(xAverage + 1, xMax, yAverage + 1, yMax);
+		}
+	}
+	
 	private static Color determinePixelColor(Ray ray, int depth) {
 
 		Color pixelColor = new Color(0, 0, 0);
@@ -61,7 +74,7 @@ public class SimpleRayTracing {
 		else if(hasIntersect(SURFACES, ray)) {
 
 			Vector3D hitPoint = ray.getRayAtT();
-			Vector3D normal = hitPoint.subtract(ray.getSurface().getCenter());
+			Vector3D normal = hitPoint.subtract(ray.getSurface().getCenter()).normalize();
 			Vector3D direction = hitPoint.subtract(normal.multiply(2).multiply(hitPoint.dot(normal)));
 
 			Surface intersectedObject = ray.getSurface();
@@ -156,19 +169,21 @@ public class SimpleRayTracing {
 	private static ArrayList<Surface> initializeSurfaces() {
 
 		ArrayList<Surface> surfaces = new ArrayList<Surface>();
-		surfaces.add(new Orb(new Vector3D(294, 1, 1), 109.1, "sun.jpg"));
-		surfaces.add(new Sphere(new Vector3D(166, 0, 0), .40, "mercury.png"));	
-		surfaces.add(new Sphere(new Vector3D(161, 0, 0), .95, "venus.jpg"));
-		surfaces.add(new Sphere(new Vector3D(154, 0, 0), 1, "earth.jpg"));
-		surfaces.add(new Sphere(new Vector3D(154.5, 0, 2), .25, "moon.jpg"));
-		surfaces.add(new Sphere(new Vector3D(143.5, 0, 0), .7, "mars.jpg"));
-		surfaces.add(new Sphere(new Vector3D(96, 0, 0), 11, "jupiter.jpg"));
-		surfaces.add(new Sphere(new Vector3D(22, 0, 0), 9, "saturn.jpg"));
-		surfaces.add(new Disc(new Vector3D(22, .1, 0), new Vector3D(23, -.1, -1), new Vector3D(22, -.1, -1), 11, 20, "saturnRings.png"));
-		surfaces.add(new Sphere(new Vector3D(-122, 0, 0), 5, "uranus.png"));
-		surfaces.add(new Disc(new Vector3D(-122, 0, 0), new Vector3D(-123, -3, 0), new Vector3D(-119, 0, 10), 6, 10, "uranusRings.png"));
-		surfaces.add(new Sphere(new Vector3D(-260, 0, 0), 4, "neptune.jpg"));
-
+//		surfaces.add(new Orb(new Vector3D(294, 1, 1), 109.1, "sun.jpg"));
+//		surfaces.add(new Sphere(new Vector3D(166, 0, 0), .40, "mercury.png"));	
+//		surfaces.add(new Sphere(new Vector3D(161, 0, 0), .95, "venus.jpg"));
+//		surfaces.add(new Sphere(new Vector3D(154, 0, 0), 1, "earth.jpg"));
+//		surfaces.add(new Sphere(new Vector3D(154.5, 0, 2), .25, "moon.jpg"));
+//		surfaces.add(new Sphere(new Vector3D(143.5, 0, 0), .7, "mars.jpg"));
+//		surfaces.add(new Sphere(new Vector3D(96, 0, 0), 11, "jupiter.jpg"));
+//		surfaces.add(new Sphere(new Vector3D(22, 0, 0), 9, "saturn.jpg"));
+//		surfaces.add(new Disc(new Vector3D(22, .1, 0), new Vector3D(23, .1, -1), new Vector3D(22, -.1, -1), 11, 20, "saturnRings.png"));
+//		surfaces.add(new Sphere(new Vector3D(-122, 0, 0), 5, "uranus.png"));
+//		surfaces.add(new Disc(new Vector3D(-122, 0, 0), new Vector3D(-123, -3, 0), new Vector3D(-119, -2, 10), 6, 10, "uranusRings.png"));
+//		surfaces.add(new Sphere(new Vector3D(-260, 0, 0), 4, "neptune.jpg"));
+		surfaces.add(new Orb(new Vector3D(0, 10, -10), 1));
+		surfaces.add(new Sphere(new Vector3D(0, 1, -10), 1, Color.RED));
+		
 		return surfaces;
 	}
 
